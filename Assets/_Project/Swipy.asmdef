@@ -1,0 +1,20 @@
+{
+    "name": "Swipy",
+    "rootNamespace": "",
+    "references": [
+        "GUID:6055be8ebefd69e48b49212b09b47b2f",
+        "GUID:8625484626d88db459468c43c3c4e81a",
+        "GUID:8325c092914ee9e4a96f43434c393bf4",
+        "GUID:562f1f753c16f5842a9f1c1a7bdbf913",
+        "GUID:9459b88195abfab4096b9094a20700cc"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

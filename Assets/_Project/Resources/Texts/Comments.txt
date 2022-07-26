@@ -1,0 +1,35 @@
+3-Star:
+Excellent
+Very good
+Superb
+Outstanding
+Magnificent
+Fantastic
+Great
+
+2-Star:
+Good
+Sound
+Nice
+Decent
+Suitable
+Fine
+Acceptable
+
+1-Star:
+Fair
+Moderate
+Average
+Passable
+Okay
+Tolerable
+Not bad
+
+0-Star:
+Poor
+Unlucky
+Unacceptable
+Awful
+Grim
+Sorry
+Keep pushing!
