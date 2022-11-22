@@ -1,47 +1,33 @@
 using UnityEngine;
 using static Racer.Utilities.SingletonPattern;
 
-public class TimeController : Singleton<TimeController>
+internal class TimeController : Singleton<TimeController>
 {
-    float initialTime;
-
-    float finalTime;
-
-    float totalTime;
-
+    private float _initialTime;
+    private float _finalTime;
+    private float _totalTime;
 
 
     protected override void Awake()
     {
         base.Awake();
     
-        initialTime = 0;
-
-        finalTime = 0;
-
-        totalTime = 0;
+        _initialTime = 0;
+        _finalTime = 0;
+        _totalTime = 0;
     }
-
 
     public void StartTimer()
     {
-        initialTime = Time.unscaledTime;
+        _initialTime = Time.unscaledTime;
     }
 
     public void EndTimer()
     {
-        finalTime = (Time.unscaledTime - initialTime);
+        _finalTime = (Time.unscaledTime - _initialTime);
 
-        totalTime += finalTime;
+        _totalTime += _finalTime;
     }
 
-    public float GetTotalTime()
-    {
-        return totalTime;
-    }
-
-    public float GetCurrentTime()
-    {
-        return finalTime;
-    }
+    public float GetTotalTime() => _totalTime;
 }

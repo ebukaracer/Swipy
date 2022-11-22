@@ -1,84 +1,83 @@
 using Racer.SaveSystem;
 using System.Collections.Generic;
+using Racer.Utilities;
 using UnityEngine;
 using static Racer.Utilities.SingletonPattern;
 
-public class LevelManager : Singleton<LevelManager>
+internal class LevelManager : Singleton<LevelManager>
 {
-    int mostRecentLevel;
+    private int _mostRecentLevel;
 
-    int totalRatings;
+    [SerializeField] private List<Level> levels;
+    [SerializeField] private Transform levelGenerator;
 
-    [SerializeField]
-    List<Level> levels;
+    public int TotalRating { get; private set; }
 
-    [SerializeField]
-    Transform levelGenerator;
-
-    public int GetTotalRatings { get => totalRatings; }
-
-
-    // Review
-    public void InitializeLevels()
+    protected override void Awake()
     {
-        levels.Clear();
+        base.Awake();
 
-        if (levelGenerator.childCount <= 0)
-        {
-            return;
-        }
-
-        // Populate list
-        for (int i = 0; i < levelGenerator.childCount; i++)
-        {
-            levels.Add(levelGenerator.GetChild(i).GetComponent<Level>());
-        }
+        InitLevelProperties();
     }
 
-    private void Start()
+
+    private void InitLevelProperties()
     {
+        _mostRecentLevel = SaveSystem.GetData("MostRecentLevel", 1);
 
         for (int i = 0; i < levels.Count; i++)
         {
-            if (SaveSystem.GetData<int>($"SwipeCount_{levels[i].GetLevelNumber}") == 0)
+            // Swipe Count
+            if (SaveSystem.GetData<int>($"SwipeCount_{levels[i].LevelNumber}") == 0)
             {
-                SaveSystem.SaveData($"SwipeCount_{levels[i].GetLevelNumber}", levels[i].SwipeCount);
+                SaveSystem.SaveData($"SwipeCount_{levels[i].LevelNumber}", levels[i].SwipeCount);
             }
 
-            if (SaveSystem.GetData<float>($"TotalSwipeTime_{levels[i].GetLevelNumber}") == 0f)
+            // Swipe Time
+            if (SaveSystem.GetData<float>($"TotalSwipeTime_{levels[i].LevelNumber}") == 0f)
             {
-                SaveSystem.SaveData($"TotalSwipeTime_{levels[i].GetLevelNumber}", levels[i].SwipeTime);
+                SaveSystem.SaveData($"TotalSwipeTime_{levels[i].LevelNumber}", levels[i].SwipeTime);
             }
 
-            if (SaveSystem.GetData<int>($"StarCount_{levels[i].GetLevelNumber}") != 0)
+            // Ratings
+            if (SaveSystem.GetData<int>($"StarCount_{levels[i].LevelNumber}") != 0)
             {
+                var count = SaveSystem.GetData<int>($"StarCount_{levels[i].LevelNumber}");
+
+                TotalRating += count;
+
                 var rateUI = levels[i].GetComponentInChildren<RateInitializer>();
 
-                if (rateUI != null && rateUI.gameObject.activeInHierarchy)
-                {
-                    int count = SaveSystem.GetData<int>($"StarCount_{levels[i].GetLevelNumber}");
+                if (!rateUI || !rateUI.gameObject.activeInHierarchy) continue;
 
-                    rateUI.SetRate(count);
+                rateUI.SetRate(count);
 
-                    levels[i].Rating = count;
-
-                    totalRatings += count;
-                }
+                levels[i].Rating = count;
             }
         }
 
-        mostRecentLevel = SaveSystem.GetData("MostRecentLevel", 1);
-
-
-        // Level 1 Unlocked here(auto)
-        for (int i = 0; i < mostRecentLevel; i++)
+        for (int i = 0; i < _mostRecentLevel; i++)
         {
             UnlockLevel(i);
         }
     }
 
+    #region Editor Prototype
+    public void InitializeLevels()
+    {
+        levels.Clear();
 
-    // When player manually selects a level
+        if (levelGenerator.childCount <= 0)
+            return;
+
+        for (int i = 0; i < levelGenerator.childCount; i++)
+        {
+            levels.Add(levelGenerator.GetChild(i).GetComponent<Level>());
+        }
+    }
+    #endregion
+
+    // Loads a level from level menu.
     public void LoadLevelManual(int index)
     {
         if (levels[index - 1].HasUnlocked)

@@ -2,60 +2,54 @@
 using UnityEngine.UI;
 using System.Collections;
 
-class HealthBar : ScoreBar
+internal class HealthBar : ScoreBar
 {
-    int healthBarIndex = 0;
-
-    Health health;
-
-    public int HealthCount { get; private set; }
-
-    [Space(10f)]
+    public int HealthCount { get; private set; } // Static
+    public int HealthStatus { get; private set; } // Dynamic
 
     [SerializeField]
-    Image[] healthBars;
+    private Image[] healthBars;
 
 
     private void Start()
     {
-        health = GetComponent<Health>();
-
-        HealthCount = health.initialHealth;
-
-        health.OnHealthChange += Health_OnHealthChange;
+        HealthCount = healthBars.Length;
+        HealthStatus = HealthCount - 1;
     }
 
-
-    private void Health_OnHealthChange(float amt)
+    public void ModifyHealth()
     {
-        HealthCount--;
+        if (GameManager.Instance.IsGameover)
+            return;
 
-        StartCoroutine(SmoothChange(amt));
+        StartCoroutine(SmoothChange());
 
+        GameOverCheck();
     }
 
-    protected override IEnumerator SmoothChange(float amount)
+    protected override IEnumerator SmoothChange(float amount = 0)
     {
-        float initialHealthbarValue = healthBars[healthBarIndex].fillAmount;
+        var initialValue = healthBars[HealthStatus].fillAmount;
 
         float elapsed = 0;
 
-        while (elapsed < duration)
+        while (elapsed < smoothDuration)
         {
             elapsed += Time.deltaTime;
 
-            healthBars[healthBarIndex].fillAmount = Mathf.Lerp(initialHealthbarValue, amount, elapsed / duration);
+            healthBars[HealthStatus].fillAmount = Mathf.Lerp(initialValue, amount, elapsed / smoothDuration);
 
-            yield return null;
+            yield return 0;
         }
 
-        healthBars[healthBarIndex].fillAmount = amount;
+        healthBars[HealthStatus].fillAmount = amount;
 
-        healthBarIndex++;
+        HealthStatus--;
     }
 
-    private void OnDisable()
+    private void GameOverCheck()
     {
-        health.OnHealthChange -= Health_OnHealthChange;
+        if (HealthStatus <= 0)
+            GameManager.Instance.SetGameState(GameState.GameOver);
     }
 }

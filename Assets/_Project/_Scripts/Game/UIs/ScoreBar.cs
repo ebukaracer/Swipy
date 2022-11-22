@@ -1,26 +1,28 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
 
-class ScoreBar : MonoBehaviour
+internal class ScoreBar : MonoBehaviour
 {
-    Score score;
+    private Score _score;
+    private Image _scoreBarI;
 
-    Image scoreBarI;
+    [Range(0, 1), SerializeField]
+    protected float smoothDuration = .25f;
 
-    [Range(0, 1)]
-    public float duration = .25f;
+    private void Awake()
+    {
+        _score = GetComponent<Score>();
 
+        _scoreBarI = transform.GetChild(0).GetComponent<Image>();
+    }
 
     private void Start()
     {
-        score = GetComponent<Score>();
+        _scoreBarI.fillAmount = 0;
 
-        scoreBarI = transform.GetChild(0).GetComponent<Image>();
-
-        scoreBarI.fillAmount = 0;
-
-        score.OnScoreChanged += ScoreFill_OnScoreChanged;
+        _score.OnScoreChanged += ScoreFill_OnScoreChanged;
     }
 
     private void ScoreFill_OnScoreChanged(float amt)
@@ -28,22 +30,21 @@ class ScoreBar : MonoBehaviour
         StartCoroutine(SmoothChange(amt));
     }
 
-
-    protected virtual IEnumerator SmoothChange(float amount)
+    protected virtual IEnumerator SmoothChange(float amount = 0)
     {
-        float initialFillAmt = scoreBarI.fillAmount;
+        var initialFillAmt = _scoreBarI.fillAmount;
 
         float elapsed = 0;
 
-        while (elapsed < duration)
+        while (elapsed < smoothDuration)
         {
             elapsed += Time.deltaTime;
 
-            scoreBarI.fillAmount = Mathf.Lerp(initialFillAmt, amount, elapsed / duration);
+            _scoreBarI.fillAmount = Mathf.Lerp(initialFillAmt, amount, elapsed / smoothDuration);
 
-            yield return null;
+            yield return 0;
         }
 
-        scoreBarI.fillAmount = amount;
+        _scoreBarI.fillAmount = amount;
     }
 }

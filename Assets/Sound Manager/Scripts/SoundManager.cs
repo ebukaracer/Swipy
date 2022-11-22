@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Audio;
+using static Racer.Utilities.SingletonPattern;
 
 namespace Racer.SoundManager
 {
@@ -8,36 +9,25 @@ namespace Racer.SoundManager
     /// Bound to two audio-sources for music and sound-effects.
     /// </summary>
     [DefaultExecutionOrder(-100)]
-    public class SoundManager : MonoBehaviour
+    public class SoundManager : SingletonPersistent<SoundManager>
     {
-        public static SoundManager Instance { get; private set; }
+        [SerializeField] private AudioSource sfxSource;
+        [SerializeField] private AudioSource musicSource;
 
-        [SerializeField]
-        AudioSource sfxSource;
-
-        [SerializeField]
-        AudioSource musicSource;
-
-        // When using audio-mixers.
+        // When using audio-mixers...
         [Space(10), SerializeField]
-        AudioMixerSnapshot[] snapshots;
-
-
-        private void Awake()
-        {
-            if (Instance == null)
-                Instance = this;
-            else
-                Destroy(gameObject);
-        }
+        private AudioMixerSnapshot[] snapshots;
 
 
         /// <summary>
         /// Plays a specified audio-clip.
+        /// </summary>
+        /// <remarks>
         /// Very applicable for short-looping clips.
         /// This plays over an already playing clip.
-        /// </summary>
+        /// </remarks>
         /// <param name="clip">Audio-clip to play</param>
+        /// <param name="volumeScale">Amount to scale this Audio-clip's volume</param>
         public void PlaySfx(AudioClip clip, float volumeScale = 1)
         {
             if (sfxSource.enabled)
@@ -77,15 +67,17 @@ namespace Racer.SoundManager
 
         /// <summary>
         /// Disables/enables a clip.
+        /// </summary>
+        /// <remarks>
         /// Alternative to mute but instead disables the audio-source
         /// which prevents it from playing in memory.
-        /// </summary>
-        public void EnableMusic(bool enabled) => musicSource.enabled = enabled;
+        /// </remarks>
+        public void EnableMusic(bool isEnabled) => musicSource.enabled = isEnabled;
 
         /// <summary>
         /// See also: <seealso cref="EnableMusic(bool)"/>
         /// </summary>
-        public void EnableSfx(bool enabled) => sfxSource.enabled = enabled;
+        public void EnableSfx(bool isEnabled) => sfxSource.enabled = isEnabled;
 
 
         // Smoothly transitions to a snapshot.

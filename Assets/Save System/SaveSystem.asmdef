@@ -1,7 +1,9 @@
 {
     "name": "SaveSystem",
     "rootNamespace": "Racer.SaveSystem",
-    "references": [],
+    "references": [
+        "GUID:821b0ee03ff72524ebad25077d12a3c7"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

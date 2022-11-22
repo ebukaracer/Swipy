@@ -8,16 +8,16 @@ namespace Racer.SaveSystem
     /// Efficiently converts data types to their target type.
     /// The tokens are types <see cref="SaveSystem"/> can handle.
     /// </summary>
-    class CustomConverter : JsonConverter
+    internal class CustomConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType)
         {
-            return typeof(object).Equals(objectType);
+            return typeof(object) == objectType;
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            JToken jToken = JToken.ReadFrom(reader);
+            var jToken = JToken.ReadFrom(reader);
 
             switch (reader.TokenType)
             {

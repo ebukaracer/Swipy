@@ -1,29 +1,51 @@
+﻿using DG.Tweening;
+using System.Collections;
 using UnityEngine;
-using DG.Tweening;
 
-public class SlideTween : MonoBehaviour
+internal class SlideTween : MonoBehaviour
 {
-    [Header("Tween Properties")]
-    public Vector3 endValue;
+    private float _elapsedTime;
 
-    public float duration;
+    [SerializeField,
+     Tooltip("Time(s) to return to original position when mouse button is up")]
+    private float duration;
 
-    public Ease easeType;
-
+    [Space(5),
+     SerializeField,
+     Tooltip("Animation properties")]
+    private TweenProperty2 tween;
 
     private void OnEnable()
     {
-        DoBounce();
+        DoBounceIn();
     }
 
-
-    protected virtual void DoBounce()
+    /// <summary>
+    /// Smoothly moves to target position without snapping.
+    /// </summary>
+    public IEnumerator MovePosition(Vector3 initialPos, Vector3 finalPos)
     {
-        transform.DOPunchScale(endValue, duration, 0).SetEase(easeType);
+        _elapsedTime = 0;
+
+        while (_elapsedTime < duration)
+        {
+            var newPos = Vector3.Lerp(initialPos, finalPos, _elapsedTime / duration);
+
+            transform.position = newPos;
+
+            _elapsedTime += Time.deltaTime;
+
+            yield return 0;
+        }
+
+        transform.position = finalPos;
     }
 
-    protected virtual void BounceIn(int i)
+    /// <summary>
+    /// Bounces in when instantiated.
+    /// </summary>
+    private void DoBounceIn()
     {
-        transform.DOPunchScale(endValue, duration, 0).SetEase(easeType);
+        transform.DOPunchScale(tween.endValue, duration, 0).SetEase(tween.EaseType);
     }
 }

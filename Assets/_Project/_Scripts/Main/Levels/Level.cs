@@ -3,43 +3,36 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Level : MonoBehaviour
+[DefaultExecutionOrder(-5)]
+internal class Level : MonoBehaviour
 {
-    TextMeshProUGUI levelT;
-
-    Button btn;
+    private TextMeshProUGUI _levelT;
+    private Button _btn;
 
     public event Action<Level> OnHasClicked;
 
-
     public float SwipeTime { get; set; }
-
     public int SwipeCount { get; set; }
-
     public int Rating { get; set; }
-
-    public int GetLevelNumber { get; private set; }
-
+    public int LevelNumber { get; private set; }
     public bool HasUnlocked { get; set; }
 
 
     private void Awake()
     {
-        levelT = GetComponentInChildren<TextMeshProUGUI>();
+        _levelT = GetComponentInChildren<TextMeshProUGUI>();
+        _btn = GetComponent<Button>();
 
-        btn = GetComponent<Button>();
-
-        btn.onClick.AddListener(OnClicked);
+        _btn.onClick.AddListener(OnClicked);
     }
 
 
     public void SetLevelNumber(int index)
     {
-        levelT.text = index.ToString();
+        _levelT.text = $"{index}";
 
-        GetLevelNumber = index;
+        LevelNumber = index;
     }
 
-    void OnClicked() => OnHasClicked?.Invoke(this);
-
+    private void OnClicked() => OnHasClicked?.Invoke(this);
 }

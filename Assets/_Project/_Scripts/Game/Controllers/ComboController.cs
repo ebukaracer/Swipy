@@ -1,50 +1,53 @@
 ﻿using DG.Tweening;
 using Racer.SoundManager;
 using System.Collections;
+using Racer.Utilities;
 using TMPro;
 using UnityEngine;
 
-class ComboController : SlideTween
+internal class ComboController : MonoBehaviour
 {
-    IEnumerator initialRoutine;
+    private Coroutine _initialRoutine;
+    private TextMeshProUGUI _comboT;
 
-    TextMeshProUGUI comboT;
+    private string _initialText;
 
-    string originalStr;
+    [SerializeField]
+    private AudioClip comboSfx;
 
-    [Space(10), SerializeField]
-    AudioClip comboSfx;
+    [Space(5),
+     SerializeField]
+    private TweenProperty2 tween;
+
 
     private void Awake()
     {
-        comboT = GetComponent<TextMeshProUGUI>();
+        _comboT = GetComponent<TextMeshProUGUI>();
 
-        originalStr = comboT.text;
+        _initialText = _comboT.text;
     }
 
-    protected override void BounceIn(int i)
+    protected virtual void BounceIn(int i)
     {
-        comboT.SetText("Combo {0}!", i);
+        _comboT.SetText("Combo {0}!", i);
 
         SoundManager.Instance.PlaySfx(comboSfx);
 
-        comboT.rectTransform.DOPunchScale(endValue, duration, 1).SetEase(easeType)
+        _comboT.rectTransform.DOPunchScale(tween.endValue, tween.Duration, 1).SetEase(tween.EaseType)
             .OnComplete(delegate
             {
-                if (initialRoutine != null)
-                    StopCoroutine(initialRoutine);
+                if (_initialRoutine != null)
+                    StopCoroutine(_initialRoutine);
 
-                initialRoutine = DelayBeforeClear();
-
-                StartCoroutine(initialRoutine);
+                _initialRoutine = StartCoroutine(nameof(DelayBeforeClear));
             });
     }
 
-    IEnumerator DelayBeforeClear()
+    private IEnumerator DelayBeforeClear()
     {
-        yield return Utilities.GetWaitForSeconds(duration * duration);
+        yield return Utility.GetWaitForSeconds(tween.Duration);
 
-        comboT.text = originalStr;
+        _comboT.text = _initialText;
     }
 
     public void PunchScale(int count) => BounceIn(count);

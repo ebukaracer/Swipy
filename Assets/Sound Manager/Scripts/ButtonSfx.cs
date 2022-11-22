@@ -5,11 +5,9 @@ namespace Racer.SoundManager
     /// <summary>
     /// Plays a specific sound-effect.
     /// </summary>
-    class ButtonSfx : MonoBehaviour
+    public class ButtonSfx : MonoBehaviour
     {
-        [SerializeField]
-        AudioClip clip;
-
+        [SerializeField] private AudioClip clip;
 
         public void Play()
         {

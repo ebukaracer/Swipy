@@ -4,9 +4,8 @@ using UnityEngine;
 
 
 [CustomEditor(typeof(LevelGenerator))]
-public class LevelGeneratorEditor : Editor
+internal class LevelGeneratorEditor : Editor
 {
-
     public override void OnInspectorGUI()
     {
         base.OnInspectorGUI();
@@ -14,9 +13,9 @@ public class LevelGeneratorEditor : Editor
         var levelGenerator = (LevelGenerator)target;
 
         GUILayout.BeginHorizontal();
-        bool spawnLevelBtn = GUILayout.Button("Spawn Levels");
+        var spawnLevelBtn = GUILayout.Button("Spawn Levels");
 
-        bool clearLevelBtn = GUILayout.Button("Clear Levels");
+        var clearLevelBtn = GUILayout.Button("Clear Levels");
         GUILayout.EndHorizontal();
 
         if (spawnLevelBtn)

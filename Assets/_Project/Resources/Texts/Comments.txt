@@ -1,22 +1,13 @@
-3-Star:
-Excellent
-Very good
-Superb
-Outstanding
-Magnificent
-Fantastic
-Great
+#0-Star:
+Poor
+Unlucky
+Unacceptable
+Awful
+Grim
+Sorry
+Keep pushing!
 
-2-Star:
-Good
-Sound
-Nice
-Decent
-Suitable
-Fine
-Acceptable
-
-1-Star:
+#1-Star:
 Fair
 Moderate
 Average
@@ -25,11 +16,20 @@ Okay
 Tolerable
 Not bad
 
-0-Star:
-Poor
-Unlucky
-Unacceptable
-Awful
-Grim
-Sorry
-Keep pushing!
+#2-Star:
+Good
+Sound
+Nice
+Decent
+Suitable
+Fine
+Acceptable
+
+#3-Star:
+Excellent
+Very good
+Superb
+Outstanding
+Magnificent
+Fantastic
+Great

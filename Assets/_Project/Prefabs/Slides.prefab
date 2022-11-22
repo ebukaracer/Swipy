@@ -4874,7 +4874,6 @@ GameObject:
   - component: {fileID: 3362512927252728712}
   - component: {fileID: 2612299265493549929}
   - component: {fileID: -3702054353863325312}
-  - component: {fileID: 564507199}
   - component: {fileID: 5905003407111257408}
   m_Layer: 0
   m_Name: Slides
@@ -4955,25 +4954,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 1388473253091538444}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 56e8d18c115df5c4da43913e707d897e, type: 3}
+  m_Script: {fileID: 11500000, guid: 21a4cfd266c945e4b80126e02e0bf3ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   duration: 0.25
---- !u!114 &564507199
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1388473253091538444}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d518f850aaa04a94fbe8d07e9adf8aab, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  endValue: {x: 0.3, y: 0.3, z: 0.3}
-  duration: 0.3
-  easeType: 31
+  tween:
+    Duration: 0.2
+    EaseType: 19
+    endValue: {x: 0.3, y: 0.3, z: 0.3}
 --- !u!114 &5905003407111257408
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4986,7 +4974,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81173989e6226104eb5148b8ba010da0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isSwiping: 0
   deactivateOffset: 7
   destroyOffset: 30
   sqrDistance: 0.25

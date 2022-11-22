@@ -2,26 +2,26 @@
 using System;
 using UnityEngine;
 
-class Score : MonoBehaviour
+internal class Score : MonoBehaviour
 {
-    int initial;
+    private int _initial;
+    private float _current;
 
-    float current;
+    public event Action<float> OnScoreChanged;
 
-    public event Action<float> OnScoreChanged = delegate { };
-
-    private void Start()
+    private void Awake()
     {
-        current = 0;
+        _current = 0;
 
-        initial = SaveSystem.GetData<int>($"SwipeCount_{SaveSystem.GetData("CurrentLevelIndex", 1)}");
+        _initial = SaveSystem.GetData<int>
+            ($"SwipeCount_{SaveSystem.GetData("CurrentLevelIndex", 1)}");
     }
 
     public void ModifyScore(float amt)
     {
-        current += amt;
+        _current += amt;
 
-        float pctChange = current / initial;
+        var pctChange = _current / _initial;
 
         OnScoreChanged?.Invoke(pctChange);
     }

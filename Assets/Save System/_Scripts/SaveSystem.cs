@@ -13,10 +13,19 @@ namespace Racer.SaveSystem
     /// </summary>
     public class SaveSystem
     {
-        private static DataValues dataValues = new DataValues();
+#if UNITY_2021_1_OR_NEWER
+        private static DataValues _dataValues = new();
+#else
+        private static DataValues _dataValues = new DataValues();
+#endif
+        // Checks if the contents has been loaded previously instead of reloading every time.
+        private static bool _hasLoaded;
 
-        // Checks to know if the contents has been loaded previously instead of reloading every time.
-        static bool hasLoaded;
+        // Short-hand way of accessing the static methods in (SavePaths.cs)
+        private static string _saveDir = SavePaths.SaveDirectoryPath;
+        private static string _saveFile = SavePaths.SaveFilePath;
+        private static string _saveFileMeta = SavePaths.SaveFileMetaPath;
+
 
 
         /// <summary>
@@ -27,22 +36,20 @@ namespace Racer.SaveSystem
         /// <param name="data">Your Save-value</param>
         public static void SaveData<T>(string key, T data)
         {
-            dataValues.AddValue(key, data);
-
-            Save();
+            _dataValues.AddValue(key, data);
         }
 
         /// <summary>
         /// Does the specified key contain such data in the save-file..?
         /// </summary>
-        /// <param name="Key">Your Save-key</param>
+        /// <param name="key">Your Save-key</param>
         /// <returns>True if such data exists otherwise False</returns>
-        public static bool Contains(string Key)
+        public static bool Contains(string key)
         {
-            if (!hasLoaded)
+            if (!_hasLoaded)
                 Load();
 
-            return dataValues.ContainsKey(Key);
+            return _dataValues.ContainsKey(key);
         }
 
         /// <summary>
@@ -53,17 +60,14 @@ namespace Racer.SaveSystem
         /// <returns>Value of the specified 'Save-key'.</returns>
         public static T GetData<T>(string key)
         {
-            if (!hasLoaded)
+            if (!_hasLoaded)
                 Load();
 
-            if (!Contains(key))
-            {
-                Logging.LogWarning($"[{key}] does not exist initially. <b>Returned type's default value</b>.");
+            if (Contains(key)) return _dataValues.GetValue<T>(key);
 
-                return default;
-            }
+           // Logging.LogWarning($"[{key}] does not exist initially. <b>Returned type's default value</b>.");
 
-            return dataValues.GetValue<T>(key);
+            return default;
         }
 
         /// <summary>
@@ -73,23 +77,22 @@ namespace Racer.SaveSystem
         /// <returns>Value of the specified 'Save-key' otherwise the default value specified.</returns>
         public static T GetData<T>(string key, T defaultValue)
         {
-            if (Contains(key))
-                return dataValues.GetValue<T>(key);
-
-            return defaultValue;
+            return Contains(key) ? _dataValues.GetValue<T>(key) : defaultValue;
         }
 
         /// <summary>
         /// Saves all data at once.
+        /// </summary>
+        /// <remarks>
         /// This function is public since you might decide to save everything
         /// at a specific point in time throughout your application lifetime.
         /// For example you might decide to call this function when 
         /// loading into a new scene or when your app looses focus.
         /// See: <see cref="SavePoint"/>.
-        /// </summary>
-        public static void Save()
+        /// </remarks>
+        internal static void Save()
         {
-            var contents = JsonConvert.SerializeObject(dataValues, Formatting.Indented);
+            var contents = JsonConvert.SerializeObject(_dataValues, Formatting.Indented);
 
             File.WriteAllText(SavePaths.SaveFilePath, contents);
         }
@@ -98,12 +101,17 @@ namespace Racer.SaveSystem
         /// <summary>
         /// Loads all key_values stored in the (save-file) as json string.
         /// Creates a new save-file if there is none to store the loaded contents.
-        /// Loaded save-file casted to the target type upon which it was saved.
+        /// Loaded save-file type-cast to the target type upon which it was saved.
         /// </summary>
-        public static void Load()
+        /// <remarks>
+        /// Basically, if the contents of the save-file is null/empty, the data-value container,
+        /// gets initialized to null which would result to an exception,
+        /// to prevent this we re-save the null/empty-contents which,
+        /// initializes the content(s) of the data-value container to,
+        /// empty strings.
+        /// </remarks>
+        internal static void Load()
         {
-            var saveFile = string.Empty;
-
             try
             {
                 if (!InitSaveDirAndFile())
@@ -113,27 +121,18 @@ namespace Racer.SaveSystem
                     return;
                 }
 
-                saveFile = SavePaths.SaveFilePath;
+                var contents = File.ReadAllText(_saveFile);
 
-                string contents = File.ReadAllText(saveFile);
-
-                ///<summary>
-                /// Basically, if the contents of the save-file is null/empty, the data-value container,
-                /// gets initialized to null which would result to an exception,
-                /// to prevent this we re-save the null/empty-contents which,
-                /// initializes the content(s) of the data-value container to,
-                /// empty strings.
-                /// </summary>
                 if (string.IsNullOrEmpty(contents))
                 {
                     Save();
 
-                    contents = File.ReadAllText(saveFile);
+                    contents = File.ReadAllText(_saveFile);
                 }
 
-                dataValues = JsonConvert.DeserializeObject<DataValues>(contents, new CustomConverter());
+                _dataValues = JsonConvert.DeserializeObject<DataValues>(contents, new CustomConverter());
 
-                hasLoaded = true;
+                _hasLoaded = true;
             }
 
             catch (Exception ex)
@@ -143,28 +142,23 @@ namespace Racer.SaveSystem
 
             // Creates a new save-file and directory.
             // Swift if save-file/directory  already exits.
-            static bool InitSaveDirAndFile()
+            bool InitSaveDirAndFile()
             {
-                string saveDir = SavePaths.SaveDirectoryPath;
-
-                string saveFile = SavePaths.SaveFilePath;
-
                 try
                 {
-                    if (!Directory.Exists(saveDir))
-                        Directory.CreateDirectory(saveDir);
+                    if (!Directory.Exists(_saveDir))
+                        Directory.CreateDirectory(_saveDir);
 
-                    if (!File.Exists(saveFile))
-                    {
-                        // Refactor from (unity version >= 2021)
-                        using (var fs = File.Create(saveFile)) { }
+                    if (File.Exists(_saveFile)) return true;
 
-                        Logging.Log($"<b>{SavePaths.SaveFileName}</b> was successfully created at <b>{saveFile}</b>.");
+                    // Refactor from (unity version >= 2021)
+                    using (File.Create(_saveFile)) { }
+
+                    Logging.Log($"<b>{SavePaths.SaveFileName}</b> was successfully created at <b>{_saveFile}</b>.");
 #if UNITY_EDITOR
+                    if (!UnityEngine.Application.isPlaying)
                         AssetDatabase.Refresh();
 #endif
-                    }
-
                     return true;
                 }
                 catch (Exception ex)
@@ -176,35 +170,30 @@ namespace Racer.SaveSystem
             }
         }
 
-
-#if UNITY_EDITOR
         /// <summary>
         /// Handles the actual creation of save-file and it's directory in the editor.
         /// </summary>
-        public static void CreateSaveDirAndFile()
+#if UNITY_EDITOR
+        internal static void CreateSaveDirAndFile(bool overwriteSaveFile)
         {
-            string saveDir = SavePaths.SaveDirectoryPath;
-
-            string saveFile = SavePaths.SaveFilePath;
-
             try
             {
                 // Creates a save-directory
-                if (!Directory.Exists(saveDir))
-                    Directory.CreateDirectory(saveDir);
+                if (!Directory.Exists(_saveDir))
+                    Directory.CreateDirectory(_saveDir);
 
 
                 // Creates or overwrites an existing save-file
-                if (File.Exists(saveFile))
+                if (File.Exists(_saveFile))
                 {
-                    if (SaveSystemUtilityWindow.OverwriteSaveFile)
-                        CreateFile($"<b>{SavePaths.SaveFileName}</b> was successfully overwritten <b>{saveFile}</b>.");
+                    if (overwriteSaveFile)
+                        CreateFile($"<b>{SavePaths.SaveFileName}</b> was successfully overwritten <b>{_saveFile}</b>.");
                     else
                         Logging.LogWarning($"A <b>{SavePaths.SaveFileName}</b> was previously created. " +
                         $"You may toggle <b>overwrite</b> if you want to overwrite the file instead.");
                 }
                 else
-                    CreateFile($"<b>{SavePaths.SaveFileName}</b> was successfully created at <b>{saveFile}</b>.");
+                    CreateFile($"<b>{SavePaths.SaveFileName}</b> was successfully created at <b>{_saveFile}</b>.");
             }
 
             catch (Exception ex)
@@ -214,12 +203,15 @@ namespace Racer.SaveSystem
 
             void CreateFile(object msg)
             {
-                // Refactor from (unity version >= 2021)
-                using (var fs = File.Create(saveFile)) { }
-
+#if UNITY_2021_1_OR_NEWER
+                using var fs = File.Create(_saveFile);
+#else
+                using (var fs = File.Create(_saveFile)) { }
+#endif
                 Logging.Log(msg);
 
-                AssetDatabase.Refresh();
+                if (!UnityEngine.Application.isPlaying)
+                    AssetDatabase.Refresh();
             }
         }
 #endif
@@ -229,28 +221,27 @@ namespace Racer.SaveSystem
         /// </summary>
         public static void DeleteSaveFile()
         {
-            string saveFile = SavePaths.SaveFilePath;
-
-            string saveFileMeta = SavePaths.SaveFileMetaPath;
-
             try
             {
-                if (!File.Exists(saveFile))
+                if (!File.Exists(_saveFile))
                 {
                     Logging.LogWarning($"No save-file found to delete!");
 
                     return;
                 }
 
-                File.Delete(saveFile);
+                File.Delete(_saveFile);
 
-                if (!string.IsNullOrEmpty(saveFileMeta))
-                    File.Delete(saveFileMeta);
+                if (!string.IsNullOrEmpty(_saveFileMeta))
+                    File.Delete(_saveFileMeta);
+
+                _dataValues.KeyValues.Clear();
 
                 Logging.Log($"<b>{SavePaths.SaveFileName}</b> was successfully deleted.");
 
 #if UNITY_EDITOR
-                AssetDatabase.Refresh();
+                if (!UnityEngine.Application.isPlaying)
+                    AssetDatabase.Refresh();
 #endif
             }
 

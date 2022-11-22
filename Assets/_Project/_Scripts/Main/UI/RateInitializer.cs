@@ -1,30 +1,26 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-class RateInitializer : MonoBehaviour
+internal class RateInitializer : MonoBehaviour
 {
-    readonly Image[] images = new Image[3];
+    private readonly Image[] _images = new Image[3];
 
-    [SerializeField]
-    Sprite image;
+    [SerializeField] private Sprite image;
 
 
     private void Awake()
     {
-        var count = transform.childCount;
-
-        for (int i = 0; i < count; i++)
+        for (int i = 0; i < transform.childCount; i++)
         {
-            images[i] = transform.GetChild(i).GetComponent<Image>();
+            _images[i] = transform.GetChild(i).GetComponent<Image>();
         }
-
     }
 
     public void SetRate(int count)
     {
         for (int i = 0; i < count; i++)
         {
-            images[i].sprite = image;
+            _images[i].sprite = image;
         }
     }
 }

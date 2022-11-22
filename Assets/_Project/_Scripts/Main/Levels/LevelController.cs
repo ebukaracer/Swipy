@@ -1,19 +1,16 @@
-﻿using UnityEngine;
+﻿using Racer.LoadManager;
+using Racer.Utilities;
+using UnityEngine;
 using UnityEngine.UI;
 
-class LevelController : MonoBehaviour
+internal class LevelController : MonoBehaviour
 {
-    int currentlySelectedLevel;
+    private int _currentlySelectedLevel;
+    private Level _level;
 
-    Level level;
-
-    [Header("Info Bar Elements")]
-
-    [SerializeField]
-    InfoPane infoPane;
-
-    [SerializeField]
-    Button infoPaneBtnPlay;
+    [Header("INFO BAR ELEMENTS")]
+    [SerializeField] private InfoPane infoPane;
+    [SerializeField] private Button infoPaneBtnPlay;
 
 
     private void Start()
@@ -29,44 +26,38 @@ class LevelController : MonoBehaviour
     {
         var go = transform.GetChild(index);
 
-        level = go.GetComponent<Level>();
+        if (!go.TryGetComponent(out _level))
+        {
+            Logging.LogWarning($"No {nameof(Level)} attached to {go.name}");
+            return;
+        }
 
-        int i = index + 1;
+        var i = index + 1;
 
-        level.SetLevelNumber(i);
-
-        level.SwipeCount = (i * 5);
-
-        // Review
-        level.SwipeTime = level.SwipeCount / 20f;
-
-        level.OnHasClicked += Level_OnHasClicked;
+        _level.SetLevelNumber(i);
+        _level.SwipeCount = (i * 5);
+        _level.SwipeTime = _level.SwipeCount / 20f;
+        _level.OnHasClicked += Level_OnHasClicked;
     }
 
     private void Level_OnHasClicked(Level level)
     {
-        if (!infoPane.gameObject.activeInHierarchy)
-        {
-            infoPane.SetRating(level.Rating);
+        if (infoPane.gameObject.activeInHierarchy) return;
 
-            infoPane.SetInteractable(level.HasUnlocked);
+        infoPane.SetRating(level.Rating);
+        infoPane.SetInteractable(level.HasUnlocked);
+        infoPane.SetCurrentLevel(level.LevelNumber);
+        infoPane.SetSwipeCount(level.SwipeCount);
+        infoPane.SetTime(level.SwipeTime);
 
-            infoPane.SetCurrentLevel(level.GetLevelNumber);
+        UIManagerMain.Instance.ToggleInfoUI();
 
-            currentlySelectedLevel = level.GetLevelNumber;
-
-            infoPane.SetSwipeCount(level.SwipeCount);
-
-            infoPane.SetTime(level.SwipeTime);
-
-            infoPane.gameObject.SetActive(true);
-        }
+        _currentlySelectedLevel = level.LevelNumber;
     }
 
-    void MoveToNextLevel()
+    private void MoveToNextLevel()
     {
-        LevelManager.Instance.LoadLevelManual(currentlySelectedLevel);
-
-        Utilities.LoadNewScene(1);
+        LevelManager.Instance.LoadLevelManual(_currentlySelectedLevel);
+        LoadManager.Instance.LoadSceneAsync(1);
     }
 }

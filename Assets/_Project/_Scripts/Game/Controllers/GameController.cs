@@ -3,77 +3,60 @@ using System;
 using UnityEngine;
 using static Racer.Utilities.SingletonPattern;
 
-class GameController : Singleton<GameController>
+internal class GameController : Singleton<GameController>
 {
-    int currentLevelIndex;
-
-    int mostRecentLevel;
-
-    float totalSwipeTime;
-
-    [SerializeField]
-    HealthBar healthBar;
-
-    [SerializeField]
-    RateTween rateAnimation;
+    private int _currentLevelIndex;
+    private int _mostRecentLevel;
+    private float _requiredTime;
 
     public event Action<int> OnReturnedRateCount;
-
     public event Action<bool> GameoverCallback;
 
+    [SerializeField] private HealthBar healthBar;
+    [SerializeField] private RateTween rateAnimation;
 
 
-    private void Start()
+    protected override void Awake()
     {
-        currentLevelIndex = SaveSystem.GetData("CurrentLevelIndex", 1);
+        base.Awake();
 
-        mostRecentLevel = SaveSystem.GetData("MostRecentLevel", 1);
-
-        totalSwipeTime = SaveSystem.GetData<float>($"TotalSwipeTime_{currentLevelIndex}");
+        _currentLevelIndex = SaveSystem.GetData("CurrentLevelIndex", 1);
+        _mostRecentLevel = SaveSystem.GetData("MostRecentLevel", 1);
+        _requiredTime = SaveSystem.GetData<float>($"TotalSwipeTime_{_currentLevelIndex}");
     }
-
 
     public void GameCompletion(bool healthStatus)
     {
-        // Lost
         if (healthStatus)
-            Fail();
-        // Won
+            Lost();
         else
             Won();
 
         GameoverCallback?.Invoke(healthStatus);
     }
 
-    void Won()
+    private void Won()
     {
-        // Logic  
-
-        var currentSwipeTime = TimeController.Instance.GetTotalTime();
-
-        int rateCount = RatingCalculator.CalculateRating(currentSwipeTime, totalSwipeTime, healthBar.HealthCount);
+        var time = TimeController.Instance.GetTotalTime();
+        var rateCount = RatingCalculator.CalculateRating(time, _requiredTime, healthBar.HealthStatus);
 
         rateAnimation.ShowStarAnimation(rateCount);
-
         OnReturnedRateCount?.Invoke(rateCount);
 
-        SaveSystem.SaveData($"StarCount_{currentLevelIndex}", rateCount);
+        SaveSystem.SaveData($"StarCount_{_currentLevelIndex}", rateCount);
 
 
-        if (currentLevelIndex == mostRecentLevel)
-            mostRecentLevel++;
+        if (_currentLevelIndex == _mostRecentLevel)
+            _mostRecentLevel++;
 
-        currentLevelIndex++;
+        _currentLevelIndex++;
 
-        SaveSystem.SaveData("CurrentLevelIndex", currentLevelIndex);
-
-        SaveSystem.SaveData("MostRecentLevel", mostRecentLevel);
+        SaveSystem.SaveData("CurrentLevelIndex", _currentLevelIndex);
+        SaveSystem.SaveData("MostRecentLevel", _mostRecentLevel);
     }
 
-    void Fail()
+    private void Lost()
     {
-        // Game over UI
-
-        SaveSystem.SaveData($"StarCount_{currentLevelIndex}", 0);
+        SaveSystem.SaveData($"StarCount_{_currentLevelIndex}", 0);
     }
 }

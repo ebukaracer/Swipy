@@ -257,8 +257,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 5272865666652778262, guid: 27d0eba3c6bf2834db99e5487879970d, type: 3}
-        m_TargetAssemblyTypeName: SoundEffect, Swipe_Game
+      - m_Target: {fileID: 6273444384886486299, guid: e2c21b6e0f24cd14da0220f11db2a1c8, type: 3}
+        m_TargetAssemblyTypeName: Racer.SoundManager.ButtonSfx, SoundManager
         m_MethodName: Play
         m_Mode: 1
         m_Arguments:

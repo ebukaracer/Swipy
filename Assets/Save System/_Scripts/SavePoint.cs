@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Racer.Utilities;
+using UnityEngine;
 #if UNITY_EDITOR
 #endif
 
@@ -6,25 +7,41 @@ namespace Racer.SaveSystem
 {
     /// <summary>
     /// Establishes a point to store all the saved data to a file.
+    /// </summary>
+    /// <remarks>
     /// Writing the contents of the saved data is a pretty much a heavy operation,
     /// This script implements some unity-callbacks where the actual saving(writing to file)
     /// would be done.
     /// This script must be added to at-most one gameobject in the scene, it can also be 
     /// persisted across scenes.
-    /// </summary>
+    /// </remarks>
 
-    [DefaultExecutionOrder(-100), AddComponentMenu("SaveSystem/SavePoint")]
-    class SavePoint : MonoBehaviour
+    [DefaultExecutionOrder(-500), AddComponentMenu("SaveSystem/SavePoint")]
+    public class SavePoint : SingletonPattern.SingletonPersistent<SavePoint>
     {
         /// <summary>
-        /// Loads all saved- in data when game is loaded.
+        /// Loads all saved-in data when game is loaded.
         /// </summary>
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
+
+            if (Instance != this) return;
+
             SaveSystem.Load();
 
-            // Comment out
-            Logging.Log($"{nameof(SavePoint)} Initialized!");
+            // Comment out, if not already...
+            // Logging.Log($"{nameof(SavePoint)} Initialized!");
+        }
+
+
+        /// <summary>
+        /// Saves all values manually at the point of calling.
+        /// Saving is performed anytime this function is called.
+        /// </summary>
+        public void SaveAll()
+        {
+            SaveSystem.Save();
         }
 
 #if !UNITY_EDITOR
@@ -41,7 +58,7 @@ namespace Racer.SaveSystem
         }
 #endif
         /// <summary>
-        /// See also: <seealso cref="OnApplicationFocus(bool)"/>.
+        /// Saves all values as soon as game is terminated.
         /// </summary>
         private void OnApplicationQuit()
         {

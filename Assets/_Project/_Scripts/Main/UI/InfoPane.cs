@@ -2,49 +2,27 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 
-public class InfoPane : MonoBehaviour
+internal class InfoPane : MonoBehaviour
 {
-    [SerializeField]
-    Sprite star;
+    [SerializeField] private Sprite star;
+    [SerializeField] private Sprite starOutline;
 
-    [SerializeField]
-    Sprite starOutline;
+    [Space(5), SerializeField]
+    private Image[] stars;
 
-    [Space(10)]
+    [Space(5), Header("TEXTS")]
+    [SerializeField] private TextMeshProUGUI timeT;
+    [SerializeField] private TextMeshProUGUI swipeCountT;
+    [SerializeField] private TextMeshProUGUI currentLevelT;
 
-    [SerializeField]
-    Image[] stars;
+    [Space(5), Header("MISC")]
+    [SerializeField] private Button btn;
 
-    [Space(10)]
-
-    [SerializeField]
-    TextMeshProUGUI timeT;
-
-    [SerializeField]
-    TextMeshProUGUI swipeCountT;
-
-    [SerializeField]
-    TextMeshProUGUI currentLevelT;
-
-    [Space(10)]
-
-    [SerializeField]
-    Button btn;
-
-    [SerializeField]
-    RectTransform rectTransform;
-
-
-    private void OnEnable()
-    {
-        UIAnimations.Instance.PopIn(rectTransform);
-    }
 
     private void OnDisable()
     {
         SetRatingToDefault();
     }
-
 
     public void SetTime(float time)
     {
@@ -58,7 +36,7 @@ public class InfoPane : MonoBehaviour
 
     public void SetCurrentLevel(int levelIndex)
     {
-        currentLevelT.text = levelIndex.ToString();
+        currentLevelT.text = $"{levelIndex}";
     }
 
     public void SetInteractable(bool state)

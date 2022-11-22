@@ -1,58 +1,52 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class LevelGenerator : MonoBehaviour
+[DefaultExecutionOrder(-4)]
+internal class LevelGenerator : MonoBehaviour
 {
-    GridLayoutGroup gridLayout;
+    private GridLayoutGroup _gridLayout;
+    private LevelController _levelController;
 
-    LevelController levelController;
+    [Space(10), Header("SPAWN PROPERTIES")]
+    [SerializeField] private Transform levelBtnPrefab;
+    [SerializeField] private int spawnAmount;
 
-    [Space(10)]
 
-    [Header("Spawn Properties")]
-
-    [SerializeField]
-    Transform levelButttonPrefab;
-
-    [SerializeField]
-    int spawnAmount;
-
-    private void Start()
+    private void Awake()
     {
-        levelController = GetComponent<LevelController>();
+        _levelController = GetComponent<LevelController>();
 
-        Destroy(GetComponent<GridLayoutGroup>(), 1f);
-
-        var childCount = transform.childCount;
-
-        for (int i = 0; i < childCount; i++)
-            levelController.InitializeLevelButtons(i);
+        for (int i = 0; i < transform.childCount; i++)
+            _levelController.InitializeLevelButtons(i);
     }
 
-
-    void AddGridLayout()
+    private void AddGridLayout()
     {
-        gridLayout = gameObject.AddComponent<GridLayoutGroup>();
+        if (TryGetComponent(out _gridLayout))
+            return;
 
-        gridLayout.padding.top = 80;
+        _gridLayout = gameObject.AddComponent<GridLayoutGroup>();
 
-        gridLayout.cellSize = new Vector2(80, 80);
-        gridLayout.spacing = new Vector2(30, 70);
+        _gridLayout.padding.top = 80;
 
-        gridLayout.startCorner = GridLayoutGroup.Corner.UpperLeft;
-        gridLayout.startAxis = GridLayoutGroup.Axis.Horizontal;
-        gridLayout.childAlignment = TextAnchor.UpperCenter;
-        gridLayout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
-        gridLayout.constraintCount = 3;
+        _gridLayout.cellSize = new Vector2(80, 80);
+        _gridLayout.spacing = new Vector2(30, 70);
+
+        _gridLayout.startCorner = GridLayoutGroup.Corner.UpperLeft;
+        _gridLayout.startAxis = GridLayoutGroup.Axis.Horizontal;
+        _gridLayout.childAlignment = TextAnchor.UpperCenter;
+        _gridLayout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+        _gridLayout.constraintCount = 3;
     }
 
+    #region Editor prototype
     public void SpawnLevels()
     {
         AddGridLayout();
 
         for (int i = 0; i < spawnAmount; i++)
         {
-            Instantiate(levelButttonPrefab, transform);
+            Instantiate(levelBtnPrefab, transform);
         }
     }
 
@@ -60,12 +54,11 @@ public class LevelGenerator : MonoBehaviour
     {
         var childCount = transform.childCount;
 
-        gridLayout = GetComponent<GridLayoutGroup>();
-
         for (int i = childCount - 1; i >= 0; i--)
             DestroyImmediate(transform.GetChild(i).gameObject);
 
-        if (gridLayout != null)
-            DestroyImmediate(gridLayout);
+        if (TryGetComponent(out _gridLayout))
+            DestroyImmediate(_gridLayout);
     }
+    #endregion
 }

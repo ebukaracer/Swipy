@@ -2,9 +2,9 @@ using UnityEngine;
 
 namespace Racer.LoadManager
 {
-    public class LoadingFx : MonoBehaviour
+    internal class LoadingFx : MonoBehaviour
     {
-        ParticleSystem _fx;
+        private ParticleSystem _fx;
 
         private void Awake()
         {
@@ -17,7 +17,6 @@ namespace Racer.LoadManager
 
             LoadManager.Instance.OnLoadFinished += Instance_OnLoadFinished;
         }
-
 
         private void Instance_OnLoadFinished()
         {

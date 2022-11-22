@@ -3,7 +3,7 @@ using UnityEditor;
 using UnityEngine;
 
 
-class LevelManagerEditor : Editor
+internal class LevelManagerEditor : Editor
 {
     [CustomEditor(typeof(LevelManager))]
     public class LevelGeneratorEditor : Editor
@@ -15,7 +15,7 @@ class LevelManagerEditor : Editor
             var levelManager = (LevelManager)target;
 
             GUILayout.BeginHorizontal();
-            bool initializeLevels = GUILayout.Button("Initialize Levels");
+            var initializeLevels = GUILayout.Button("Initialize Levels");
             GUILayout.EndHorizontal();
 
             if (initializeLevels)

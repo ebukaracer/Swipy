@@ -1,4 +1,3 @@
-using Racer.SaveSystem;
 using Racer.SoundManager;
 using System;
 using TMPro;
@@ -6,147 +5,119 @@ using UnityEngine;
 using UnityEngine.UI;
 using static UnityEngine.Random;
 
-// Order matters 
-public enum Directions
+internal class DirectionController : MonoBehaviour
 {
-    UP, DOWN,
-    LEFT, RIGHT
-}
+    private Color _original;
+    private Color _newColor;
+    private Direction _previousDir;
 
-public class DirectionController : MonoBehaviour
-{
-    Color original;
-    Color newColor;
+    private int _comboCount = 1;
+    private int _maxCombo;
 
-    int comboCount = 1;
-    int maxCombo;
+    private bool _isStarting;
 
-    bool isStarting;
+    public event Action<int> OnNewCombo;
 
-    public event Action<int> OnComboChanged;
+    [SerializeField] private Image[] directions;
+    [SerializeField] private TextMeshProUGUI directionT;
 
-    [SerializeField]
-    Image[] directions;
+    [Space(5), Header("REFERENCES")]
+    [SerializeField] private Direction currentDir;
+    [SerializeField] private HealthBar healthBar;
+    [SerializeField] private ComboController comboController;
 
-    [SerializeField]
-    TextMeshProUGUI directionT;
-
-    [Space(10)]
-
-    [SerializeField]
-    Directions currentDir;
-
-    Directions previousDir;
-
-    [Space(10)]
-
-    [SerializeField]
-    Health playerHealth;
-
-    [Space(5)]
-
-    [SerializeField]
-    ComboController comboController;
-
-    [Space(5), SerializeField]
-    AudioClip errorClip;
-
-    [SerializeField]
-    AudioClip swipeClip;
+    [Space(5), Header("CLIPS")]
+    [SerializeField] private AudioClip errorClip;
+    [SerializeField] private AudioClip swipeClip;
 
 
     private void Awake()
     {
-        original = directions[0].color;
-        newColor = Color.white;
+        _original = directions[0].color;
+        _newColor = Color.white;
     }
-
 
     private void Start()
     {
         SpawnController.Instance.OnHasSpawned += Instance_OnHasSpawned;
     }
 
-
-
     /// <summary>
     /// Generates a random direction as soon as a slide is spawned.
     /// </summary>
-    /// <param name="dragController"></param>
-    private void Instance_OnHasSpawned(DragController dragController)
+    /// <param name="slideController"></param>
+    private void Instance_OnHasSpawned(SlideController slideController)
     {
-        previousDir = currentDir;
-
+        _previousDir = currentDir;
         currentDir = GenerateDirection();
 
-        directionT.text = currentDir.ToString();
+        directionT.text = $"{currentDir}";
+        directions[(int)currentDir].color = _newColor;
 
-        directions[(int)currentDir].color = newColor;
-
-        dragController.OnMovedToDirection += DragController_OnMovedToDirection;
+        slideController.OnMovedToDirection += SlideController_OnMovedToDirection; 
     }
 
-    private void DragController_OnMovedToDirection(Directions dir)
+    private void SlideController_OnMovedToDirection(Direction dir)
     {
-        //Debug.Log("Yea");
+        if (_isStarting)
 
-        if (isStarting)
-
-            if (previousDir == currentDir && dir == currentDir)
+            if (_previousDir == currentDir && dir == currentDir)
             {
-                comboCount++;
+                _comboCount++;
 
-                if (comboCount > maxCombo)
+                if (_comboCount > _maxCombo)
                 {
-                    maxCombo = comboCount;
+                    _maxCombo = _comboCount;
 
-                    OnComboChanged.Invoke(maxCombo);
+                    OnNewCombo?.Invoke(_maxCombo);
                 }
             }
             else
-                comboCount = 1;
+                _comboCount = 1;
         else
-            isStarting = true;
-
-        if (comboCount > 1)
-            comboController.PunchScale(comboCount);
+            _isStarting = true;
 
 
+        if (_comboCount > 1)
+            comboController.PunchScale(_comboCount);
 
         for (int i = 0; i < directions.Length; i++)
         {
-            directions[i].color = original;
+            directions[i].color = _original;
         }
 
         if (dir != currentDir)
         {
-            playerHealth.ModifyHealth(1f); //Full attack
+            healthBar.ModifyHealth();
 
             SoundManager.Instance.PlaySfx(errorClip, .5f);
         }
         else
-            SoundManager.Instance.PlaySfx(swipeClip, .8f);
+            SoundManager.Instance.PlaySfx(swipeClip);
     }
 
 
-    Directions GenerateDirection()
+    private static Direction GenerateDirection()
     {
         var i = Range(0, 4);
 
         switch (i)
         {
             case 0:
-                return Directions.UP;
+                return Direction.Up;
             case 1:
-                return Directions.DOWN;
+                return Direction.Down;
             case 2:
-                return Directions.LEFT;
+                return Direction.Left;
             case 3:
-                return Directions.RIGHT;
-            default:
-                break;
+                return Direction.Right;
         }
 
         return 0;
+    }
+
+    private void OnDestroy()
+    {
+        SpawnController.Instance.OnHasSpawned -= Instance_OnHasSpawned;
     }
 }

@@ -3,37 +3,37 @@ using UnityEngine;
 using Racer.SaveSystem;
 using static Racer.Utilities.SingletonPattern;
 
-public class SpawnController : Singleton<SpawnController>
+internal class SpawnController : Singleton<SpawnController>
 {
-    public event Action<DragController> OnHasSpawned;
+    private SlideController _slideController;
 
-    DragController dragController;
+    private bool _isGameover;
+    private int _count;
+    private int _spawnAmount;
 
-    int count = 0;
+    public event Action<SlideController> OnHasSpawned;
 
-    int spawnAmount;
-
-    [SerializeField]
-    Score scoreFill;
+    [SerializeField] private Score scoreFill;
 
 
     protected override void Awake()
     {
         base.Awake();
 
-        // Gotten from Level_Amount for each level
-        spawnAmount = SaveSystem.GetData<int>($"SwipeCount_{SaveSystem.GetData("CurrentLevelIndex",1)}");
+        _spawnAmount = SaveSystem.GetData<int>
+            ($"SwipeCount_{SaveSystem.GetData("CurrentLevelIndex", 1)}");
     }
 
     private void Start()
     {
         SpawnSlide();
+
+        GameManager.OnCurrentState += GameManager_OnCurrentState;
     }
 
     public void SpawnSlide()
     {
-        // Health exhausted
-        if (GameManager.Instance.IsGameover)
+        if (_isGameover)
         {
             GameController.Instance.GameCompletion(true);
             return;
@@ -41,29 +41,26 @@ public class SpawnController : Singleton<SpawnController>
 
         var slide = ObjectPool.Instance.GetObject();
 
-        if (slide is null)
+        if (!slide)
             return;
 
+        if (!slide.TryGetComponent(out _slideController)) return;
 
-        dragController = slide.GetComponent<DragController>();
+        OnHasSpawned?.Invoke(_slideController);
 
-        OnHasSpawned?.Invoke(dragController);
+        _slideController.OnDestroyed += SpawnManager_OnDestroyed;
 
-        dragController.OnDestroyed += SpawnManager_OnDestroyed;
-
-        // Bonus Score
-        count++;
+        _count++;
     }
 
     private void SpawnManager_OnDestroyed()
     {
-        if (count < spawnAmount)
+        if (_count < _spawnAmount)
             SpawnSlide();
 
-        // Player finished swiping
         else
         {
-            GameManager.Instance.SetGameState(GameStates.GameOver);
+            GameManager.Instance.SetGameState(GameState.GameOver);
 
             GameController.Instance.GameCompletion(false);
         }
@@ -71,8 +68,15 @@ public class SpawnController : Singleton<SpawnController>
         scoreFill.ModifyScore(1f);
     }
 
+    private void GameManager_OnCurrentState(GameState value)
+    {
+        _isGameover = value == GameState.GameOver;
+    }
+
     private void OnDestroy()
     {
-        dragController.OnDestroyed -= SpawnManager_OnDestroyed;
+        _slideController.OnDestroyed -= SpawnManager_OnDestroyed;
+
+        GameManager.OnCurrentState -= GameManager_OnCurrentState;
     }
 }
