@@ -1,9 +1,16 @@
 using Racer.SaveSystem;
 using Racer.SoundManager;
 using Racer.Utilities;
+using TMPro;
+using UnityEngine;
 
-internal class SoundToggle : ToggleProvider
+public class SoundToggle : ToggleProvider
 {
+    [Space(5), Header("TARGET GRAPHICS")]
+    public TextMeshProUGUI parentText;
+    public string[] onOffTexts;
+
+
     private void Awake()
     {
         InitToggle();
@@ -25,14 +32,17 @@ internal class SoundToggle : ToggleProvider
         SyncToggle();
     }
 
-
     protected override void SyncToggle()
     {
         base.SyncToggle();
 
+        parentText.text = $"Sound: {onOffTexts[ToggleIndex]}";
+    }
+
+    protected override void ApplyToggle()
+    {
         switch (toggleState)
         {
-            // default:
             case ToggleState.On:
                 SoundManager.Instance.EnableMusic(true);
                 SoundManager.Instance.EnableSfx(true);

@@ -1,26 +1,9 @@
-using Racer.SaveSystem;
-using Racer.Utilities;
-
-internal class VfxToggle : ToggleProvider
+internal class VfxToggle : SoundToggle
 {
-    private void Awake()
+    protected override void SyncToggle()
     {
-        InitToggle();
-    }
+        toggleState = ToggleIndex == 0 ? ToggleState.On : ToggleState.Off;
 
-    protected override void InitToggle()
-    {
-        ToggleIndex = SaveSystem.GetData<int>(saveString);
-
-        SyncToggle();
-    }
-
-    public override void Toggle()
-    {
-        base.Toggle();
-
-        SaveSystem.SaveData(saveString, ToggleIndex);
-
-        SyncToggle();
+        parentText.text = $"Vfx: {onOffTexts[ToggleIndex]}";
     }
 }

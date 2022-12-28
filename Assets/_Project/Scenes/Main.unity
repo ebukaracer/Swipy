@@ -5884,8 +5884,8 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 1710185674}
-        m_TargetAssemblyTypeName: VfxToggle, Swipy
+      - m_Target: {fileID: 2108851742}
+        m_TargetAssemblyTypeName: SoundToggle, Swipy
         m_MethodName: Toggle
         m_Mode: 1
         m_Arguments:
@@ -12556,7 +12556,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 1710185675}
+      - m_Target: {fileID: 2108851741}
         m_TargetAssemblyTypeName: SoundToggle, Swipy
         m_MethodName: Toggle
         m_Mode: 1
@@ -12580,7 +12580,7 @@ GameObject:
   - component: {fileID: 647332346}
   - component: {fileID: 647332345}
   m_Layer: 5
-  m_Name: ParticlesT
+  m_Name: VfxT
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -32680,8 +32680,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1710185670}
-  - component: {fileID: 1710185675}
-  - component: {fileID: 1710185674}
   - component: {fileID: 1710185672}
   - component: {fileID: 1710185673}
   - component: {fileID: 1710185671}
@@ -32767,42 +32765,6 @@ MonoBehaviour:
     StartValue: {x: 0, y: 0}
     EndValue: {x: 60, y: 95}
     rectTransform: {fileID: 0}
---- !u!114 &1710185674
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1710185669}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 31127afddf19296488b65eaadba9503c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  toggleState: 0
-  saveString: Vfx
-  parentText: {fileID: 647332345}
-  onOffTexts:
-  - 'Vfx: ON'
-  - 'Vfx: OFF'
---- !u!114 &1710185675
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1710185669}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f80a63382b800a949b53126803cce25e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  toggleState: 0
-  saveString: Sound
-  parentText: {fileID: 725256284}
-  onOffTexts:
-  - 'Sound: ON'
-  - 'Sound: OFF'
 --- !u!1 &1711329046
 GameObject:
   m_ObjectHideFlags: 0
@@ -41719,6 +41681,8 @@ GameObject:
   - component: {fileID: 2108851739}
   - component: {fileID: 2108851738}
   - component: {fileID: 2108851737}
+  - component: {fileID: 2108851741}
+  - component: {fileID: 2108851742}
   m_Layer: 5
   m_Name: Static
   m_TagString: Untagged
@@ -41809,6 +41773,42 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &2108851741
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2108851736}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f80a63382b800a949b53126803cce25e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  toggleState: 0
+  saveString: Sound
+  parentText: {fileID: 725256284}
+  onOffTexts:
+  - On
+  - Off
+--- !u!114 &2108851742
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2108851736}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31127afddf19296488b65eaadba9503c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  toggleState: 0
+  saveString: Vfx
+  parentText: {fileID: 647332345}
+  onOffTexts:
+  - On
+  - Off
 --- !u!1 &2111737407
 GameObject:
   m_ObjectHideFlags: 0
@@ -42446,7 +42446,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7620809970486477663, guid: e16f30938937d9d429b826ba9506f636, type: 3}
       propertyPath: m_Alpha
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e16f30938937d9d429b826ba9506f636, type: 3}

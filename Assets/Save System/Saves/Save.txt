@@ -120,11 +120,16 @@
     "TotalSwipeTime_59": 14.75,
     "SwipeCount_60": 300,
     "TotalSwipeTime_60": 15.0,
-    "Combo": 2,
+    "Combo": 4,
     "Fastest_Time": 0.01735115,
-    "Slowest_Time": 0.01735115,
+    "Slowest_Time": 0.477992058,
     "StarCount_1": 3,
-    "CurrentLevelIndex": 2,
-    "MostRecentLevel": 2
+    "CurrentLevelIndex": 5,
+    "MostRecentLevel": 5,
+    "Vfx": 1,
+    "Sound": 0,
+    "StarCount_2": 3,
+    "StarCount_3": 2,
+    "StarCount_4": 3
   }
 }

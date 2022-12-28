@@ -661,7 +661,7 @@ PlayerSettings:
   webGLThreadsSupport: 0
   webGLDecompressionFallback: 0
   scriptingDefineSymbols:
-    7: '!ENABLE_LOG;!ENABLE_LOG_WARNING'
+    7: '!ENABLE_LOG;!ENABLE_LOG_WARNING;!ENABLE_LOG_ERROR'
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend: {}
